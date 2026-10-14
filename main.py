@@ -14,6 +14,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
 def _get_image_url(candidate):
     image_url = candidate.get("url")
     if (
@@ -24,6 +25,7 @@ def _get_image_url(candidate):
         return candidate["hdurl"]
     return image_url or candidate.get("hdurl")
 
+
 def work():
     logger.info(
         "RUN SOURCE: %s",
@@ -33,7 +35,7 @@ def work():
     print("Current time: " + datetime.now().strftime("%H:%M:%S") + "\n")
 
     apod_helper = ApodApiHelper()
-    apod_data = apod_helper.get_apod_data()
+    apod_data = apod_helper.get_random_apod_data()
 
     if not apod_data:
         raise Exception("Failed to fetch APOD data from NASA.")
@@ -45,7 +47,7 @@ def work():
 
     # Do not repost an APOD date that has already succeeded.
     date_str = original_apod["date"]
-    
+
     posted_dates_file = "posted_dates.txt"
     if os.path.exists(posted_dates_file):
         with open(posted_dates_file, "r") as f:
@@ -106,8 +108,7 @@ def work():
     if direct_video:
         logger.info("APOD is a video; attempting to post NASA video directly")
     else:
-        candidate = apod_helper.get_random_apod_data()
-        logger.info("APOD is not a direct-postable video; using a random image APOD")
+        logger.info("Using a random APOD image")
 
     video_path = None
     try:
@@ -175,16 +176,17 @@ def work():
         f.write(date_str + "\n")
     print("Idempotency recorded. Done.")
 
+
 def reel_test():
     print('\n' + "Working" + '\n')
     print("Current time: " + datetime.now().strftime("%H:%M:%S") + "\n")
 
     reel_generator = ReelGenerator()
     image_url = "https://apod.nasa.gov/apod/image/2502/SaturnIR_CassiniKakitsev_960.jpg"
-    description = """This infrared mosaic from the Cassini spacecraft shows Saturn's northern hemisphere in a light that is not visible to human eyes. The image was taken in 2006 and shows the gas giant's rings, as well as the hexagonal storm at its north pole. The storm is a persistent feature of the planet's atmosphere and has been observed for decades. The image was created using data from Cassini's visual and infrared mapping spectrometer, which can detect light at wavelengths beyond the visible spectrum. The false-color image was created by assigning visible colors to the infrared data, with red representing low clouds and green representing high clouds. The hexagonal storm is visible as a dark spot at the planet's north pole."""
+    description = """This infrared mosaic from the Cassini spacecraft shows Saturn's northern hemisphere in a light that is not visible to human eyes. The image was taken in 2006 and shows the ga[...]
     try:
         video_path = reel_generator.create_reel(image_url, description)
-        
+
         # Upload video file to Instagram
         instagram_helper = InstagramApiHelper()
         reel_result = instagram_helper.post_reel(
@@ -192,16 +194,17 @@ def reel_test():
             caption=f"\n\n{description}"
         )
         print("\n" + reel_result + "\n")
-        
+
         # Clean up temporary file
         if os.path.exists(video_path):
             os.remove(video_path)
-            
+
     except Exception as e:
         print(f"Error creating/posting reel: {str(e)}")
         # Ensure cleanup of temporary file in case of error
         if 'video_path' in locals() and os.path.exists(video_path):
             os.remove(video_path)
+
 
 if __name__ == "__main__":
     work()
