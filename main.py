@@ -183,7 +183,12 @@ def reel_test():
 
     reel_generator = ReelGenerator()
     image_url = "https://apod.nasa.gov/apod/image/2502/SaturnIR_CassiniKakitsev_960.jpg"
-    description = """This infrared mosaic from the Cassini spacecraft shows Saturn's northern hemisphere in a light that is not visible to human eyes. The image was taken in 2006 and shows the ga[...]
+    description = (
+        "This infrared mosaic from the Cassini spacecraft shows Saturn's northern "
+        "hemisphere in a light that is not visible to human eyes. The image was "
+        "taken in 2006 and shows the giant planet's atmosphere and rings in a "
+        "stunning cosmic palette."
+    )
     try:
         video_path = reel_generator.create_reel(image_url, description)
 
